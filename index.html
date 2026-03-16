@@ -245,7 +245,7 @@ th,td{
             <div class="quick-amounts" id="bankQuickMinus" style="justify-content:flex-end;display:grid;grid-template-columns:1fr;gap:8px"></div>
             <div>
               <label for="bankTransferAmount">Montant</label>
-              <input id="bankTransferAmount" type="number" min="1" step="1" placeholder="Ex. 150" />
+              <input id="bankTransferAmount" type="number" inputmode="numeric" pattern="[0-9]*" />
             </div>
             <div class="quick-amounts" id="bankQuickPlus" style="display:grid;grid-template-columns:1fr;gap:8px"></div>
           </div>
@@ -261,7 +261,7 @@ th,td{
           <div class="grid g2">
             <div>
               <label for="bankRequestAmount">Montant demandé</label>
-              <input id="bankRequestAmount" type="number" min="1" step="1" placeholder="Ex. 200" />
+              <input id="bankRequestAmount" type="number" inputmode="numeric" pattern="[0-9]*" />
             </div>
           </div>
           <div class="row" style="margin-top:12px">
@@ -280,7 +280,7 @@ th,td{
             </div>
             <div>
               <label for="transferAmount">Montant</label>
-              <input id="transferAmount" type="number" min="1" step="1" placeholder="Ex. 150" />
+              <input id="transferAmount" type="number" inputmode="numeric" pattern="[0-9]*" />
             </div>
           </div>
           <div class="row" style="margin-top:12px">
@@ -328,7 +328,7 @@ th,td{
         <div class="grid g2">
           <div>
             <label for="adminCode">Code admin</label>
-            <input id="adminCode" type="password" placeholder="Code admin" />
+            <input id="adminCode" type="password" inputmode="numeric" placeholder="admin123" />
           </div>
           <div style="align-self:end">
             <button id="adminLoginBtn">Ouvrir l'admin</button>
@@ -426,7 +426,7 @@ th,td{
 
         <div id="adminSettingsView" class="hidden">
           <div class="card">
-            <h3>Créer / réinitialiser une partie</h3>
+            <h3>Nouvelle partie</h3>
             <div class="grid g2">
               <div>
                 <label for="playerNames">Noms des joueurs</label>
