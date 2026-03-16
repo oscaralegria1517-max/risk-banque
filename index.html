@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prototype banque de jeu</title>
+  <style>
+    :root{
+      --bg:#0f172a;
+      --panel:#111827;
+      --panel2:#1f2937;
+      --text:#f8fafc;
+      --muted:#cbd5e1;
+      --ok:#16a34a;
+      --warn:#dc2626;
+      --accent:#2563eb;
+      --border:#334155;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:linear-gradient(180deg,#0b1220,#111827 35%,#0f172a);
+      color:var(--text);
+    }
+    .wrap{max-width:980px;margin:0 auto;padding:20px}
+    h1,h2,h3{margin:.2rem 0 1rem}
+    .card{
+      background:rgba(17,24,39,.96);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:16px;
+      margin:14px 0;
+      box-shadow:0 10px 30px rgba(0,0,0,.24);
+    }
+    .grid{display:grid;gap:12px}
+    .g2{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+    label{display:block;font-size:.95rem;color:var(--muted);margin-bottom:6px}
+    input, select, textarea, button{
+      width:100%;
+      border-radius:12px;
+      border:1px solid var(--border);
+      padding:12px 14px;
+      font-size:1rem;
+    }
+    input, select, textarea{background:#0b1220;color:var(--text)}
+    button{
+      background:var(--accent);
+      color:white;
+      border:none;
+      cursor:pointer;
+      font-weight:600;
+    }
+    button.secondary{background:#334155}
+    button.danger{background:var(--warn)}
+    button.success{background:var(--ok)}
+    button:disabled{opacity:.55;cursor:not-allowed}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .row > *{flex:1}
+    .muted{color:var(--muted)}
+    .small{font-size:.9rem}
+    .balance{
+      font-size:2.3rem;font-weight:800;letter-spacing:.5px;
+      background:#0b1220;border:1px solid var(--border);
+      border-radius:14px;padding:18px;text-align:center
+    }
+    .pill{
+      display:inline-block;padding:6px 10px;border-radius:999px;
+      background:#0b1220;border:1px solid var(--border);font-size:.85rem;color:var(--muted)
+    }
+    .meta-line{
+      background:#0b1220;border:1px solid var(--border);border-radius:12px;
+      padding:10px 12px;color:var(--muted)
+    }
+    .player-meta{display:grid;gap:10px;margin-top:12px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid var(--border);text-align:left;font-size:.95rem}
+    .ok{color:#4ade80}
+    .err{color:#f87171}
+    .hidden{display:none !important}
+    .topbar{
+      display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap
+    }
+    .notice{
+      background:#0b1220;border:1px dashed #475569;border-radius:12px;padding:12px 14px;color:var(--muted)
+    }
+    .footer{margin-top:18px;color:var(--muted);font-size:.88rem}
+    code{background:#0b1220;padding:2px 6px;border-radius:8px}
+    .tabbar{display:flex;gap:10px;flex-wrap:wrap}
+    .tabbar button{width:auto;flex:1 1 180px}
+    .quick-amounts{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+    .quick-amounts button{width:auto;flex:0 0 auto;padding:10px 12px}
+    .checkbox-list label{
+      display:flex;align-items:center;gap:8px;margin-bottom:8px;
+      background:#0b1220;border:1px solid var(--border);border-radius:12px;padding:10px 12px
+    }
+    .checkbox-list input[type="checkbox"]{width:auto;margin:0}
+    .request-item{
+      background:#0b1220;border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px
+    }
+  </style>
+
+<style>
+:root{
+  --bg: #561C24;
+  --panel: #6D2932;
+  --panel2: #7C5B63;
+  --text: #E8D8C4;
+  --muted: #C7B7A3;
+  --ok: #C7B7A3;
+  --warn: #6D2932;
+  --accent: #561C24;
+  --border: #C7B7A3;
+}
+body{
+  background: linear-gradient(180deg, #E8D8C4 0%, #C7B7A3 45%, #561C24 100%);
+  color: var(--text);
+}
+body,input,select,textarea,button,table,h1,h2,h3,.pill,.tabbar button{
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+h1{
+  font-size: 2rem;
+  margin-bottom: .3rem;
+}
+.card{
+  background: color-mix(in srgb, var(--panel) 92%, transparent);
+  border: 1px solid var(--border);
+  box-shadow: 0 14px 36px rgba(0,0,0,.22);
+}
+.notice,.meta-line,.balance,input,select,textarea{
+  background: color-mix(in srgb, var(--panel2) 88%, #000 12%);
+}
+.balance{
+  color: var(--text);
+}
+button{
+  background: var(--accent);
+}
+button.secondary{
+  background: #7C5B63;
+}
+button.danger{
+  background: var(--warn);
+}
+button.success{
+  background: var(--ok);
+}
+.tabbar button:not(.secondary){
+  box-shadow: 0 0 0 1px rgba(255,255,255,.06) inset;
+}
+.quick-amounts button{
+  border: 1px solid var(--border);
+}
+th,td{
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+}
+.footer::before{
+  content: "Palette bordeaux / crème";
+  display: block;
+  margin-bottom: .35rem;
+  color: var(--muted);
+  font-family: "Orphic", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+}
+</style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1>Prototype banque de jeu</h1>
+        <div class="muted">Version locale simple pour test sur téléphone</div>
+      </div>
+      <div class="row" style="max-width:340px">
+        <button class="secondary" id="btnShowHome">Joueur</button>
+        <button class="secondary" id="btnShowAdmin">Banque</button>
+      </div>
+    </div>
+
+    <div class="card notice">
+      Ce prototype fonctionne dans le navigateur et enregistre les données dans le stockage local de l'appareil.
+      Il est pratique pour tester la logique du jeu et l'interface.
+    </div>
+
+    <section id="homeView" class="card">
+      <h2>Choix du joueur</h2>
+      <div class="grid g2">
+        <div>
+          <label for="playerSelect">Joueur</label>
+          <select id="playerSelect"></select>
+        </div>
+        <div>
+          <label for="playerPinLogin">Code PIN</label>
+          <input id="playerPinLogin" type="password" inputmode="numeric" placeholder="0000" />
+        </div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button id="playerLoginBtn">Ouvrir mon espace</button>
+      </div>
+      <div class="small muted" style="margin-top:10px">
+        Une fois un joueur ouvert sur cet appareil, son espace reste affiché automatiquement jusqu'à déconnexion.
+      </div>
+    </section>
+
+    <section id="playerView" class="hidden">
+      <div class="card">
+        <div class="topbar">
+          <div>
+            <h2 id="playerTitle" style="cursor:pointer">Nom du joueur</h2>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="tabbar">
+          <button id="playerTabOverview">Aperçu</button>
+          <button class="secondary" id="playerTabActions">Action</button>
+          <button class="secondary" id="playerTabSettings">Paramètres</button>
+        </div>
+      </div>
+
+      <div id="playerOverviewView">
+        <div class="card">
+          <h3>Solde</h3>
+          <div class="balance" id="playerBalance" style="font-size:3.2rem">0</div>
+        </div>
+
+        <div class="card">
+          <h3>Transactions</h3>
+          <table>
+            <thead>
+              <tr><th>Type</th><th>Détail</th><th>Variation</th></tr>
+            </thead>
+            <tbody id="playerHistory"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="playerActionsView" class="hidden">
+        <div class="card">
+          <h3>Envoyer de l'argent à la banque</h3>
+          <div class="grid" style="grid-template-columns:1fr minmax(180px,220px) 1fr;align-items:center">
+            <div class="quick-amounts" id="bankQuickMinus" style="justify-content:flex-end;display:grid;grid-template-columns:1fr;gap:8px"></div>
+            <div>
+              <label for="bankTransferAmount">Montant</label>
+              <input id="bankTransferAmount" type="number" min="1" step="1" placeholder="Ex. 150" />
+            </div>
+            <div class="quick-amounts" id="bankQuickPlus" style="display:grid;grid-template-columns:1fr;gap:8px"></div>
+          </div>
+          <div class="row" style="margin-top:12px">
+            <button class="secondary" id="bankTransferResetBtn">Reset montant</button>
+            <button id="bankTransferBtn">Envoyer à la banque</button>
+          </div>
+          <div id="bankTransferMsg" class="small" style="margin-top:10px"></div>
+        </div>
+
+        <div class="card">
+          <h3>Demander de l'argent à la banque</h3>
+          <div class="grid g2">
+            <div>
+              <label for="bankRequestAmount">Montant demandé</label>
+              <input id="bankRequestAmount" type="number" min="1" step="1" placeholder="Ex. 200" />
+            </div>
+          </div>
+          <div class="row" style="margin-top:12px">
+            <button class="secondary" id="bankRequestResetBtn">Dernier montant</button>
+            <button id="bankRequestBtn">Envoyer la demande</button>
+          </div>
+          <div id="bankRequestMsg" class="small" style="margin-top:10px"></div>
+        </div>
+
+        <div class="card">
+          <h3>Envoyer de l'argent à un autre joueur</h3>
+          <div class="grid g2">
+            <div>
+              <label for="playerTransferTarget">Joueur destinataire</label>
+              <select id="playerTransferTarget"></select>
+            </div>
+            <div>
+              <label for="transferAmount">Montant</label>
+              <input id="transferAmount" type="number" min="1" step="1" placeholder="Ex. 150" />
+            </div>
+          </div>
+          <div class="row" style="margin-top:12px">
+            <button id="transferBtn">Envoyer à ce joueur</button>
+          </div>
+          <div id="transferMsg" class="small" style="margin-top:10px"></div>
+        </div>
+      </div>
+
+      <div id="playerSettingsView" class="hidden">
+        <div class="card">
+          <h3>Paramètres</h3>
+          <div class="grid g2">
+            <div>
+              <label for="renamePlayerInput">Nom du joueur</label>
+              <input id="renamePlayerInput" type="text" placeholder="Changer le nom" />
+            </div>
+            <div style="align-self:end">
+              <button id="renamePlayerBtn">Modifier</button>
+            </div>
+          </div>
+          <div id="renamePlayerMsg" class="small" style="margin-top:10px"></div>
+
+          <div class="grid g2" style="margin-top:14px">
+            <div>
+              <label for="playerPinInput">Code PIN</label>
+              <input id="playerPinInput" type="password" inputmode="numeric" placeholder="Nouveau code PIN" />
+            </div>
+            <div style="align-self:end">
+              <button id="playerPinBtn">Modifier le PIN</button>
+            </div>
+          </div>
+          <div id="playerPinMsg" class="small" style="margin-top:10px"></div>
+
+          <div class="row" style="margin-top:12px">
+            <button class="danger" id="logoutPlayerBtn">Déconnexion</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="adminView" class="hidden">
+      <div id="adminLoginCard" class="card">
+        <h2>Espace admin / banque</h2>
+        <div class="grid g2">
+          <div>
+            <label for="adminCode">Code admin</label>
+            <input id="adminCode" type="password" placeholder="Code admin" />
+          </div>
+          <div style="align-self:end">
+            <button id="adminLoginBtn">Ouvrir l'admin</button>
+          </div>
+        </div>
+        <div class="small muted" style="margin-top:10px">
+          Code par défaut au premier lancement : <code>admin123</code>
+        </div>
+      </div>
+
+      <div id="adminPanel" class="hidden">
+        <div class="card">
+          <div class="tabbar">
+            <button id="adminTabDashboard">Aperçu</button>
+            <button class="secondary" id="adminTabActions">Action</button>
+            <button class="secondary" id="adminTabSettings">Paramètres</button>
+          </div>
+        </div>
+
+        <div id="adminDashboardView">
+          <div class="card">
+            <h3>Comptes joueurs</h3>
+            <div id="accountsCards" class="grid g2"></div>
+          </div>
+
+          <div class="card">
+            <h3>Transactions</h3>
+            <table>
+              <thead>
+                <tr><th>De</th><th>Vers</th><th>Montant</th><th>Statut</th></tr>
+              </thead>
+              <tbody id="globalHistory"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="adminActionsView" class="hidden">
+          <div class="card">
+            <h3>Banque vers joueur</h3>
+            <div class="grid g2">
+              <div>
+                <label for="bankGiveTarget">Joueur</label>
+                <select id="bankGiveTarget"></select>
+              </div>
+              <div>
+                <label for="bankGiveAmount">Montant</label>
+                <input id="bankGiveAmount" type="number" min="1" step="1" placeholder="Ex. 200" />
+              </div>
+            </div>
+            <div class="row" style="margin-top:12px">
+              <button class="success" id="bankGiveBtn">Envoyer depuis la banque</button>
+            </div>
+            <div id="bankGiveMsg" class="small" style="margin-top:10px"></div>
+          </div>
+
+          <div class="card">
+            <h3>Demandes d'argent à la banque</h3>
+            <div id="bankRequestsList"></div>
+          </div>
+
+          <div class="card">
+            <h3>Joueur vers banque</h3>
+            <div class="grid g2">
+              <div>
+                <label>Joueurs à prélever</label>
+                <div id="bankTakeTargets" class="checkbox-list"></div>
+              </div>
+              <div>
+                <label for="bankTakeAmount">Montant</label>
+                <input id="bankTakeAmount" type="number" min="1" step="1" placeholder="Ex. 200" />
+              </div>
+            </div>
+            <div class="row" style="margin-top:12px">
+              <button class="secondary" id="selectAllPlayersBtn">Tout sélectionner</button>
+              <button class="secondary" id="clearPlayerSelectionBtn">Tout désélectionner</button>
+              <button id="bankTakeBtn">Prélever vers la banque</button>
+            </div>
+            <div id="bankTakeMsg" class="small" style="margin-top:10px"></div>
+          </div>
+
+          <div class="card">
+            <h3>Inflation</h3>
+            <div class="notice">
+              <strong id="adminPriceState">Prix actuels : x1</strong><br />
+              <span class="small" id="adminQuickAmountsPreview">Boutons joueur : 10 / 20 / 30 / 50</span>
+            </div>
+            <div class="row" style="margin-top:12px">
+              <button class="secondary" id="halvePricesBtn">Diviser les prix</button>
+              <button id="resetPricesBtn">Réinitialiser les prix</button>
+              <button class="secondary" id="doublePricesBtn">Doubler les prix</button>
+            </div>
+            <div id="priceAdminMsg" class="small" style="margin-top:10px"></div>
+          </div>
+        </div>
+
+        <div id="adminSettingsView" class="hidden">
+          <div class="card">
+            <h3>Créer / réinitialiser une partie</h3>
+            <div class="grid g2">
+              <div>
+                <label for="playerNames">Noms des joueurs</label>
+                <textarea id="playerNames" rows="6" placeholder="Un joueur par ligne&#10;Léa&#10;Noah&#10;Maya"></textarea>
+              </div>
+              <div>
+                <label for="initialBalance">Solde initial par joueur</label>
+                <input id="initialBalance" type="number" min="0" step="1" value="1000" />
+                <div style="height:12px"></div>
+                <label for="bankStart">Solde de la banque</label>
+                <input id="bankStart" type="number" min="0" step="1" value="1000000" />
+                <div style="height:12px"></div>
+                <label for="newAdminCode">Nouveau code admin</label>
+                <input id="newAdminCode" type="text" placeholder="Laisser vide pour garder l'actuel" />
+              </div>
+            </div>
+            <div class="row" style="margin-top:12px">
+              <button class="success" id="createGameBtn">Créer / réinitialiser</button>
+              <button class="danger" id="wipeBtn">Effacer complètement</button>
+            </div>
+            <div id="setupMsg" class="small" style="margin-top:10px"></div>
+          </div>
+
+          <div class="card">
+            <h3>Modifier le nom d'un joueur</h3>
+            <div class="grid g2">
+              <div>
+                <label for="adminRenamePlayerSelect">Joueur</label>
+                <select id="adminRenamePlayerSelect"></select>
+              </div>
+              <div>
+                <label for="adminRenamePlayerInput">Nouveau nom</label>
+                <input id="adminRenamePlayerInput" type="text" placeholder="Nouveau nom" />
+              </div>
+            </div>
+            <div class="row" style="margin-top:12px">
+              <button id="adminRenamePlayerBtn">Modifier le nom</button>
+            </div>
+            <div id="adminRenameMsg" class="small" style="margin-top:10px"></div>
+          </div>
+
+          <div class="card">
+            <h3>Recharger la banque</h3>
+            <div class="grid g2">
+              <div>
+                <label for="bankReloadAmount">Montant</label>
+                <input id="bankReloadAmount" type="number" min="1" step="1" placeholder="Ex. 10000" />
+              </div>
+              <div style="align-self:end">
+                <button id="bankReloadBtn">Recharger la banque</button>
+              </div>
+            </div>
+            <div id="bankReloadMsg" class="small" style="margin-top:10px"></div>
+          </div>
+
+          <div class="card">
+            <div class="row">
+              <button class="danger" id="adminLogoutBtn">Déconnexion admin</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      Une fois validé, on pourra retravailler le visuel sans toucher à cette structure.
+    </div>
+  </div>
+
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import { getDatabase, ref, set, get, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
+
+const STORAGE_KEY = "banque_jeu_prototype_v_shared";
+const LOCAL_SESSION_KEY = "banque_jeu_session_local";
+
+/*
+  1) Remplace firebaseConfig avec les valeurs de ton projet Firebase.
+  2) Vérifie que la Realtime Database est activée.
+  3) Tu peux changer le nom de partie via l'URL:
+     .../index.html?partie=ma-partie
+*/
+const firebaseConfig = {
+  apiKey: "AIzaSyCIVh_vP1A5PHd3RCZ2jtRKTTFty9XsljU",
+  authDomain: "risk-banque.firebaseapp.com",
+  databaseURL: "https://risk-banque-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "risk-banque",
+  storageBucket: "risk-banque.firebasestorage.app",
+  messagingSenderId: "1052602726539",
+  appId: "1:1052602726539:web:4e1862cad0f8d21e0a3c8e"
+};
+
+const GAME_ID = new URLSearchParams(window.location.search).get("partie") || "partie-demo";
+
+function defaultState(){
+  return {
+    adminCode: "admin123",
+    players: [],
+    bank: { name: "Banque", balance: 1000000 },
+    transactions: [],
+    baseQuickAmounts: [10,20,30,50],
+    priceMultiplier: 1,
+    bankRequests: [],
+    lastBankRequestAmount: ""
+  };
+}
+
+function normalizeState(state){
+  if(!state || typeof state !== "object") state = defaultState();
+  if(typeof state.adminCode !== "string" || !state.adminCode) state.adminCode = "admin123";
+  if(!Array.isArray(state.players)) state.players = [];
+  state.players = state.players.map(p => ({
+    id: p.id,
+    name: p.name || "Joueur",
+    balance: Number(p.balance || 0),
+    pin: String(p.pin || "0000"),
+    history: Array.isArray(p.history) ? p.history : []
+  }));
+  if(!state.bank || typeof state.bank !== "object") state.bank = { name: "Banque", balance: 1000000 };
+  state.bank.name = "Banque";
+  state.bank.balance = Number(state.bank.balance || 0);
+  if(!Array.isArray(state.transactions)) state.transactions = [];
+  if(!Array.isArray(state.baseQuickAmounts)) state.baseQuickAmounts = [10,20,30,50];
+  if(typeof state.priceMultiplier !== "number" || !Number.isFinite(state.priceMultiplier) || state.priceMultiplier <= 0){
+    state.priceMultiplier = 1;
+  }
+  if(!Array.isArray(state.bankRequests)) state.bankRequests = [];
+  if(state.lastBankRequestAmount === undefined) state.lastBankRequestAmount = "";
+  return state;
+}
+
+function loadSession(){
+  try{
+    const raw = localStorage.getItem(LOCAL_SESSION_KEY);
+    if(!raw) return { lastPlayer: null };
+    const session = JSON.parse(raw);
+    return { lastPlayer: session?.lastPlayer || null };
+  }catch{
+    return { lastPlayer: null };
+  }
+}
+
+function saveSession(){
+  localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(session));
+}
+
+function fmt(n){
+  return Number(n || 0).toLocaleString("fr-FR");
+}
+
+function nowStr(){
+  return new Date().toLocaleString("fr-FR");
+}
+
+function getQuickAmounts(state){
+  return (state.baseQuickAmounts || [10,20,30,50]).map(v => Math.round(v * state.priceMultiplier * 100) / 100);
+}
+
+function findPlayer(state, id){
+  return state.players.find(p => p.id === id);
+}
+
+function addTx(state, tx){
+  state.transactions.unshift({ date: nowStr(), ...tx });
+  state.transactions = state.transactions.slice(0, 500);
+}
+
+function recordPersonal(state, playerId, entry){
+  const p = findPlayer(state, playerId);
+  if(!p) return;
+  p.history.unshift({ date: nowStr(), ...entry });
+  p.history = p.history.slice(0, 100);
+}
+
+function transfer(state, fromId, toId, amount, actor="system"){
+  amount = Number(amount);
+  if(!Number.isFinite(amount) || amount <= 0) return {ok:false, msg:"Montant invalide."};
+
+  const fromObj = fromId === "bank" ? state.bank : findPlayer(state, fromId);
+  const toObj = toId === "bank" ? state.bank : findPlayer(state, toId);
+
+  if(!fromObj || !toObj) return {ok:false, msg:"Compte introuvable."};
+  if(fromId === toId) return {ok:false, msg:"Impossible d'envoyer à soi-même."};
+
+  if(fromObj.balance < amount){
+    addTx(state, {
+      from: fromObj.name,
+      to: toObj.name,
+      amount,
+      status: "Refusé - solde insuffisant",
+      actor
+    });
+    return {ok:false, msg:"Solde insuffisant."};
+  }
+
+  fromObj.balance -= amount;
+  toObj.balance += amount;
+
+  addTx(state, {
+    from: fromObj.name,
+    to: toObj.name,
+    amount,
+    status: "OK",
+    actor
+  });
+
+  if(fromId !== "bank"){
+    recordPersonal(state, fromId, {
+      type: "Paiement",
+      detail: "Vers " + toObj.name,
+      delta: -amount
+    });
+  }
+  if(toId !== "bank"){
+    recordPersonal(state, toId, {
+      type: "Réception",
+      detail: "De " + fromObj.name,
+      delta: amount
+    });
+  }
+
+  return {ok:true, msg:"Transfert effectué."};
+}
+
+function adjustAmountField(fieldId, delta){
+  const field = document.getElementById(fieldId);
+  const current = Number(field.value || 0);
+  let next = current + delta;
+  if(!Number.isFinite(next) || next < 0) next = 0;
+  field.value = next === 0 ? "" : String(next);
+}
+
+function resetAmountField(fieldId){
+  const field = document.getElementById(fieldId);
+  if(field) field.value = "";
+}
+
+let adminUnlocked = false;
+let stateCache = normalizeState(defaultState());
+let firebaseReady = false;
+let app, db, gameRef;
+let connectionError = null;
+
+function currentState(){
+  return stateCache;
+}
+
+function showFirebaseBannerError(message){
+  const notice = document.querySelector(".notice");
+  if(notice){
+    notice.innerHTML = message;
+  }
+}
+
+function showPlayerOnly(){
+  document.getElementById("homeView").classList.add("hidden");
+  document.getElementById("adminView").classList.add("hidden");
+  document.getElementById("playerView").classList.remove("hidden");
+}
+
+function showHome(){
+  const playerId = session.lastPlayer;
+  if(playerId && findPlayer(currentState(), playerId)){
+    renderPlayer();
+    showPlayerOverview();
+    showPlayerOnly();
+    return;
+  }
+  session.lastPlayer = null;
+  saveSession();
+  document.getElementById("homeView").classList.remove("hidden");
+  document.getElementById("playerView").classList.add("hidden");
+  document.getElementById("adminView").classList.add("hidden");
+}
+
+function showAdmin(){
+  document.getElementById("homeView").classList.add("hidden");
+  document.getElementById("playerView").classList.add("hidden");
+  document.getElementById("adminView").classList.remove("hidden");
+
+  if(adminUnlocked){
+    document.getElementById("adminLoginCard").classList.add("hidden");
+    document.getElementById("adminPanel").classList.remove("hidden");
+  } else {
+    document.getElementById("adminLoginCard").classList.remove("hidden");
+    document.getElementById("adminPanel").classList.add("hidden");
+  }
+}
+
+function showPlayerOverview(){
+  document.getElementById("playerOverviewView").classList.remove("hidden");
+  document.getElementById("playerActionsView").classList.add("hidden");
+  document.getElementById("playerSettingsView").classList.add("hidden");
+  document.getElementById("playerTabOverview").classList.remove("secondary");
+  document.getElementById("playerTabActions").classList.add("secondary");
+  document.getElementById("playerTabSettings").classList.add("secondary");
+}
+function showPlayerActions(){
+  document.getElementById("playerOverviewView").classList.add("hidden");
+  document.getElementById("playerActionsView").classList.remove("hidden");
+  document.getElementById("playerSettingsView").classList.add("hidden");
+  document.getElementById("playerTabOverview").classList.add("secondary");
+  document.getElementById("playerTabActions").classList.remove("secondary");
+  document.getElementById("playerTabSettings").classList.add("secondary");
+}
+function showPlayerSettings(){
+  document.getElementById("playerOverviewView").classList.add("hidden");
+  document.getElementById("playerActionsView").classList.add("hidden");
+  document.getElementById("playerSettingsView").classList.remove("hidden");
+  document.getElementById("playerTabOverview").classList.add("secondary");
+  document.getElementById("playerTabActions").classList.add("secondary");
+  document.getElementById("playerTabSettings").classList.remove("secondary");
+}
+
+function showAdminDashboard(){
+  document.getElementById("adminDashboardView").classList.remove("hidden");
+  document.getElementById("adminActionsView").classList.add("hidden");
+  document.getElementById("adminSettingsView").classList.add("hidden");
+  document.getElementById("adminTabDashboard").classList.remove("secondary");
+  document.getElementById("adminTabActions").classList.add("secondary");
+  document.getElementById("adminTabSettings").classList.add("secondary");
+}
+function showAdminActions(){
+  document.getElementById("adminDashboardView").classList.add("hidden");
+  document.getElementById("adminActionsView").classList.remove("hidden");
+  document.getElementById("adminSettingsView").classList.add("hidden");
+  document.getElementById("adminTabDashboard").classList.add("secondary");
+  document.getElementById("adminTabActions").classList.remove("secondary");
+  document.getElementById("adminTabSettings").classList.add("secondary");
+}
+function showAdminSettings(){
+  document.getElementById("adminDashboardView").classList.add("hidden");
+  document.getElementById("adminActionsView").classList.add("hidden");
+  document.getElementById("adminSettingsView").classList.remove("hidden");
+  document.getElementById("adminTabDashboard").classList.add("secondary");
+  document.getElementById("adminTabActions").classList.add("secondary");
+  document.getElementById("adminTabSettings").classList.remove("secondary");
+}
+
+function refreshPlayerSelects(){
+  const state = currentState();
+  const playerSelect = document.getElementById("playerSelect");
+  const bankGiveTarget = document.getElementById("bankGiveTarget");
+  const bankTakeTargets = document.getElementById("bankTakeTargets");
+  const playerTransferTarget = document.getElementById("playerTransferTarget");
+  const adminRenamePlayerSelect = document.getElementById("adminRenamePlayerSelect");
+
+  playerSelect.innerHTML = "";
+  if(bankGiveTarget) bankGiveTarget.innerHTML = "";
+  if(bankTakeTargets) bankTakeTargets.innerHTML = "";
+  if(playerTransferTarget) playerTransferTarget.innerHTML = "";
+  if(adminRenamePlayerSelect) adminRenamePlayerSelect.innerHTML = "";
+
+  const players = state.players.map(p => ({id:p.id, name:p.name}));
+
+  if(players.length === 0){
+    playerSelect.innerHTML = `<option value="">Aucune partie créée</option>`;
+    if(bankGiveTarget) bankGiveTarget.innerHTML = `<option value="">Aucun compte</option>`;
+    if(bankTakeTargets) bankTakeTargets.innerHTML = `<div class="muted">Aucun compte</div>`;
+    if(playerTransferTarget) playerTransferTarget.innerHTML = `<option value="">Aucun autre joueur</option>`;
+    if(adminRenamePlayerSelect) adminRenamePlayerSelect.innerHTML = `<option value="">Aucun joueur</option>`;
+    return;
+  }
+
+  players.forEach(p => {
+    const o = document.createElement("option");
+    o.value = p.id;
+    o.textContent = p.name;
+    playerSelect.appendChild(o);
+
+    if(bankGiveTarget){
+      const og = document.createElement("option");
+      og.value = p.id;
+      og.textContent = p.name;
+      bankGiveTarget.appendChild(og);
+    }
+
+    if(adminRenamePlayerSelect){
+      const oa = document.createElement("option");
+      oa.value = p.id;
+      oa.textContent = p.name;
+      adminRenamePlayerSelect.appendChild(oa);
+    }
+
+    if(bankTakeTargets){
+      const wrap = document.createElement("label");
+      wrap.innerHTML = `<input type="checkbox" class="bankTakeCheckbox" value="${p.id}" /> <span>${p.name}</span>`;
+      bankTakeTargets.appendChild(wrap);
+    }
+  });
+
+  if(playerTransferTarget){
+    const currentPlayerId = session.lastPlayer;
+    const others = players.filter(p => p.id !== currentPlayerId);
+    if(others.length === 0){
+      playerTransferTarget.innerHTML = `<option value="">Aucun autre joueur</option>`;
+    } else {
+      others.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p.id;
+        opt.textContent = p.name;
+        playerTransferTarget.appendChild(opt);
+      });
+    }
+  }
+}
+
+function renderQuickAmountButtons(){
+  const state = currentState();
+  const amounts = getQuickAmounts(state);
+  const plusWrap = document.getElementById("bankQuickPlus");
+  const minusWrap = document.getElementById("bankQuickMinus");
+  if(!plusWrap || !minusWrap) return;
+
+  plusWrap.innerHTML = "";
+  minusWrap.innerHTML = "";
+
+  amounts.forEach(amount => {
+    const plusBtn = document.createElement("button");
+    plusBtn.type = "button";
+    plusBtn.className = "secondary";
+    plusBtn.textContent = "+" + fmt(amount);
+    plusBtn.addEventListener("click", () => adjustAmountField("bankTransferAmount", amount));
+    plusWrap.appendChild(plusBtn);
+
+    const minusBtn = document.createElement("button");
+    minusBtn.type = "button";
+    minusBtn.className = "secondary";
+    minusBtn.textContent = "-" + fmt(amount);
+    minusBtn.addEventListener("click", () => adjustAmountField("bankTransferAmount", -amount));
+    minusWrap.appendChild(minusBtn);
+  });
+}
+
+function renderBankRequests(){
+  const state = currentState();
+  const wrap = document.getElementById("bankRequestsList");
+  if(!wrap) return;
+  wrap.innerHTML = "";
+
+  const pending = state.bankRequests.filter(r => r.status === "pending");
+  if(!pending.length){
+    wrap.innerHTML = `<div class="muted">Aucune demande en attente.</div>`;
+    return;
+  }
+
+  pending.forEach(req => {
+    const p = findPlayer(state, req.playerId);
+    const item = document.createElement("div");
+    item.className = "request-item";
+    item.innerHTML = `
+      <strong>${p ? p.name : "Joueur inconnu"}</strong><br />
+      <span class="small">Montant demandé : ${fmt(req.amount)}</span><br />
+      <span class="small">Créée le ${req.date}</span>
+      <div class="row" style="margin-top:12px">
+        <button class="success" data-request-id="${req.id}" data-action="accept">Oui</button>
+        <button class="danger" data-request-id="${req.id}" data-action="refuse">Non</button>
+      </div>
+    `;
+    wrap.appendChild(item);
+  });
+
+  wrap.querySelectorAll("button[data-request-id]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const requestId = btn.dataset.requestId;
+      const action = btn.dataset.action;
+      await commitState((state) => {
+        const req = state.bankRequests.find(r => r.id === requestId);
+        if(!req || req.status !== "pending") return { abort:true };
+        const p = findPlayer(state, req.playerId);
+
+        if(action === "accept"){
+          const res = transfer(state, "bank", req.playerId, req.amount, "admin");
+          req.status = res.ok ? "accepted" : "failed";
+          req.processed_at = nowStr();
+        } else {
+          req.status = "refused";
+          req.processed_at = nowStr();
+          addTx(state, {
+            from: "Banque",
+            to: p ? p.name : "Joueur",
+            amount: req.amount,
+            status: "Demande refusée",
+            actor: "admin"
+          });
+        }
+        return { ok:true };
+      });
+    });
+  });
+}
+
+function renderPlayer(){
+  const state = currentState();
+  const playerId = session.lastPlayer;
+  const view = document.getElementById("playerView");
+  if(!playerId){
+    view.classList.add("hidden");
+    return;
+  }
+
+  const p = findPlayer(state, playerId);
+  if(!p){
+    session.lastPlayer = null;
+    saveSession();
+    view.classList.add("hidden");
+    return;
+  }
+
+  view.classList.remove("hidden");
+  document.getElementById("playerTitle").textContent = p.name;
+  document.getElementById("playerBalance").textContent = fmt(p.balance);
+  document.getElementById("renamePlayerInput").value = p.name;
+
+  refreshPlayerSelects();
+  renderQuickAmountButtons();
+
+  const tbody = document.getElementById("playerHistory");
+  tbody.innerHTML = "";
+  const allHistory = p.history || [];
+  allHistory.forEach(h => {
+    const tr = document.createElement("tr");
+    const cls = Number(h.delta) >= 0 ? "ok" : "err";
+    tr.innerHTML = `<td>${h.type}</td><td>${h.detail}</td><td class="${cls}">${Number(h.delta) >= 0 ? "+" : ""}${fmt(h.delta)}</td>`;
+    tbody.appendChild(tr);
+  });
+  if(allHistory.length === 0){
+    tbody.innerHTML = `<tr><td colspan="3" class="muted">Aucune transaction pour le moment.</td></tr>`;
+  }
+}
+
+function renderAdmin(){
+  const state = currentState();
+
+  const cards = document.getElementById("accountsCards");
+  cards.innerHTML = "";
+  state.players.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "card";
+    const recent = (p.history || []).slice(0,5).map(h => {
+      const sign = Number(h.delta) >= 0 ? "+" : "";
+      return `<div class="${Number(h.delta) >= 0 ? 'ok' : 'err'}">${sign}${fmt(h.delta)}</div>`;
+    }).join("") || `<div class="muted">Aucune transaction</div>`;
+
+    let balanceTrace = [0];
+    let running = 0;
+    (p.history || []).slice().reverse().forEach(h => {
+      running += Number(h.delta || 0);
+      balanceTrace.push(running);
+    });
+    if(balanceTrace.length < 2) balanceTrace = [0, p.balance || 0];
+    const min = Math.min(...balanceTrace);
+    const max = Math.max(...balanceTrace);
+    const range = (max - min) || 1;
+    const pts = balanceTrace.map((v, i) => {
+      const x = (i / (balanceTrace.length - 1 || 1)) * 100;
+      const y = 40 - ((v - min) / range) * 40;
+      return `${x},${y}`;
+    }).join(" ");
+
+    card.innerHTML = `
+      <h4 style="margin:.2rem 0 .6rem">${p.name}</h4>
+      <div class="small muted" style="margin-bottom:8px">Solde : ${fmt(p.balance)}</div>
+      <div style="display:grid;gap:6px;margin-bottom:10px">${recent}</div>
+      <div style="background:#fff;border-radius:10px;padding:6px">
+        <svg viewBox="0 0 100 40" width="100%" height="54" preserveAspectRatio="none">
+          <polyline fill="none" stroke="#6D2932" stroke-width="2" points="${pts}" />
+        </svg>
+      </div>
+    `;
+    cards.appendChild(card);
+  });
+
+  document.getElementById("adminPriceState").textContent = "Prix actuels : x" + state.priceMultiplier;
+  document.getElementById("adminQuickAmountsPreview").textContent = "Boutons joueur : " + getQuickAmounts(state).map(v => fmt(v)).join(" / ");
+
+  renderBankRequests();
+
+  const g = document.getElementById("globalHistory");
+  g.innerHTML = "";
+  state.transactions.forEach(tx => {
+    const statusClass = tx.status === "OK" ? "ok" : "err";
+    g.innerHTML += `<tr><td>${tx.from}</td><td>${tx.to}</td><td>${fmt(tx.amount)}</td><td class="${statusClass}">${tx.status}</td></tr>`;
+  });
+  if(!g.innerHTML) g.innerHTML = `<tr><td colspan="4" class="muted">Aucune transaction</td></tr>`;
+}
+
+async function commitState(mutator){
+  if(!firebaseReady){
+    return { ok:false, msg:"Firebase n'est pas encore prêt." };
+  }
+  let result = { ok:true, msg:"Mise à jour effectuée." };
+  const txResult = await runTransaction(gameRef, (current) => {
+    const state = normalizeState(current || defaultState());
+    const maybe = mutator(state);
+    if(maybe && maybe.abort){
+      result = maybe;
+      return;
+    }
+    if(maybe) result = maybe;
+    return state;
+  }, { applyLocally: false });
+
+  if(!txResult.committed){
+    return result.abort ? { ok:false, msg:"Action annulée." } : { ok:false, msg:"Mise à jour non appliquée." };
+  }
+  return result;
+}
+
+async function initializeFirebase(){
+  const hasPlaceholder = Object.values(firebaseConfig).some(v => String(v).includes("REMPLACE_"));
+  if(hasPlaceholder){
+    showFirebaseBannerError(`Remplace d'abord <code>firebaseConfig</code> dans le fichier par les vraies valeurs de ton projet Firebase, puis déploie sur Vercel.`);
+    return;
+  }
+
+  try{
+    app = initializeApp(firebaseConfig);
+    db = getDatabase(app);
+    gameRef = ref(db, `games/${GAME_ID}`);
+
+    const snap = await get(gameRef);
+    if(!snap.exists()){
+      await set(gameRef, defaultState());
+    }
+
+    onValue(gameRef, (snapshot) => {
+      stateCache = normalizeState(snapshot.val() || defaultState());
+      refreshPlayerSelects();
+      renderPlayer();
+      renderAdmin();
+      if(session.lastPlayer && !findPlayer(stateCache, session.lastPlayer)){
+        session.lastPlayer = null;
+        saveSession();
+      }
+      firebaseReady = true;
+      if(document.getElementById("adminView").classList.contains("hidden") &&
+         document.getElementById("playerView").classList.contains("hidden")){
+        showHome();
+      }
+    }, (error) => {
+      connectionError = error;
+      showFirebaseBannerError(`Erreur Firebase : ${error.message}`);
+    });
+
+    showFirebaseBannerError(`Connecté à la partie partagée <strong>${GAME_ID}</strong>. Héberge ce fichier sur Vercel et ouvre la même URL sur chaque téléphone.`);
+  } catch (error) {
+    connectionError = error;
+    showFirebaseBannerError(`Configuration Firebase invalide : ${error.message}`);
+  }
+}
+
+let session = loadSession();
+
+document.getElementById("btnShowHome").addEventListener("click", showHome);
+document.getElementById("playerTitle").addEventListener("click", renderPlayer);
+document.getElementById("btnShowAdmin").addEventListener("click", showAdmin);
+
+document.getElementById("playerTabOverview").addEventListener("click", showPlayerOverview);
+document.getElementById("playerTabActions").addEventListener("click", showPlayerActions);
+document.getElementById("playerTabSettings").addEventListener("click", showPlayerSettings);
+
+document.getElementById("adminTabDashboard").addEventListener("click", showAdminDashboard);
+document.getElementById("adminTabActions").addEventListener("click", showAdminActions);
+document.getElementById("adminTabSettings").addEventListener("click", showAdminSettings);
+
+document.getElementById("playerLoginBtn").addEventListener("click", () => {
+  const state = currentState();
+  const id = document.getElementById("playerSelect").value;
+  const pin = document.getElementById("playerPinLogin").value.trim();
+  const p = findPlayer(state, id);
+  if(!p){
+    alert("Aucune partie créée.");
+    return;
+  }
+  if(pin !== String(p.pin || "0000")){
+    alert("Code PIN incorrect.");
+    return;
+  }
+  session.lastPlayer = id;
+  saveSession();
+  document.getElementById("playerPinLogin").value = "";
+  renderPlayer();
+  showPlayerOverview();
+  showPlayerOnly();
+});
+
+document.getElementById("logoutPlayerBtn").addEventListener("click", () => {
+  session.lastPlayer = null;
+  saveSession();
+  resetAmountField("bankTransferAmount");
+  resetAmountField("bankRequestAmount");
+  resetAmountField("transferAmount");
+  document.getElementById("bankTransferMsg").innerHTML = "";
+  document.getElementById("bankRequestMsg").innerHTML = "";
+  document.getElementById("transferMsg").innerHTML = "";
+  document.getElementById("playerPinMsg").innerHTML = "";
+  document.getElementById("playerPinLogin").value = "";
+  showHome();
+});
+
+document.getElementById("bankTransferResetBtn").addEventListener("click", () => {
+  resetAmountField("bankTransferAmount");
+  document.getElementById("bankTransferMsg").innerHTML = "";
+});
+document.getElementById("bankRequestResetBtn").addEventListener("click", () => {
+  const state = currentState();
+  document.getElementById("bankRequestAmount").value = state.lastBankRequestAmount || "";
+  document.getElementById("bankRequestMsg").innerHTML = "";
+});
+
+document.getElementById("bankTransferBtn").addEventListener("click", async () => {
+  const fromId = session.lastPlayer;
+  const amount = document.getElementById("bankTransferAmount").value;
+  const msg = document.getElementById("bankTransferMsg");
+  if(!fromId){
+    msg.innerHTML = `<span class="err">Tu n'es pas connecté.</span>`;
+    return;
+  }
+  const result = await commitState((state) => transfer(state, fromId, "bank", amount, "player"));
+  msg.innerHTML = result.ok ? `<span class="ok">${result.msg}</span>` : `<span class="err">${result.msg}</span>`;
+  if(result.ok) resetAmountField("bankTransferAmount");
+});
+
+document.getElementById("bankRequestBtn").addEventListener("click", async () => {
+  const playerId = session.lastPlayer;
+  const amount = Number(document.getElementById("bankRequestAmount").value);
+  const msg = document.getElementById("bankRequestMsg");
+
+  if(!playerId){
+    msg.innerHTML = `<span class="err">Tu n'es pas connecté.</span>`;
+    return;
+  }
+  if(!Number.isFinite(amount) || amount <= 0){
+    msg.innerHTML = `<span class="err">Montant invalide.</span>`;
+    return;
+  }
+
+  const result = await commitState((state) => {
+    const p = findPlayer(state, playerId);
+    state.lastBankRequestAmount = amount;
+    state.bankRequests.unshift({
+      id: "req_" + Date.now() + "_" + Math.random().toString(36).slice(2,8),
+      playerId,
+      amount,
+      date: nowStr(),
+      status: "pending"
+    });
+    addTx(state, {
+      from: p ? p.name : "Joueur",
+      to: "Banque",
+      amount,
+      status: "Demande envoyée",
+      actor: "player"
+    });
+    return { ok:true, msg:"Demande envoyée à la banque." };
+  });
+
+  msg.innerHTML = result.ok ? `<span class="ok">${result.msg}</span>` : `<span class="err">${result.msg}</span>`;
+  if(result.ok) resetAmountField("bankRequestAmount");
+});
+
+document.getElementById("transferBtn").addEventListener("click", async () => {
+  const fromId = session.lastPlayer;
+  const toId = document.getElementById("playerTransferTarget").value;
+  const amount = Number(document.getElementById("transferAmount").value);
+  const msg = document.getElementById("transferMsg");
+
+  if(!fromId){
+    msg.innerHTML = `<span class="err">Tu n'es pas connecté.</span>`;
+    return;
+  }
+  if(!toId){
+    msg.innerHTML = `<span class="err">Sélectionne un joueur.</span>`;
+    return;
+  }
+  if(!Number.isFinite(amount) || amount <= 0){
+    msg.innerHTML = `<span class="err">Montant invalide.</span>`;
+    return;
+  }
+
+  const result = await commitState((state) => transfer(state, fromId, toId, amount, "player"));
+  msg.innerHTML = result.ok ? `<span class="ok">${result.msg}</span>` : `<span class="err">${result.msg}</span>`;
+  if(result.ok) resetAmountField("transferAmount");
+});
+
+document.getElementById("renamePlayerBtn").addEventListener("click", async () => {
+  const playerId = session.lastPlayer;
+  const input = document.getElementById("renamePlayerInput");
+  const msg = document.getElementById("renamePlayerMsg");
+  const newName = input.value.trim();
+
+  if(!playerId){
+    msg.innerHTML = `<span class="err">Tu n'es pas connecté.</span>`;
+    return;
+  }
+  if(!newName){
+    msg.innerHTML = `<span class="err">Le nom ne peut pas être vide.</span>`;
+    return;
+  }
+
+  const result = await commitState((state) => {
+    const duplicate = state.players.find(p => p.name.toLowerCase() === newName.toLowerCase() && p.id !== playerId);
+    if(duplicate) return { abort:true, ok:false, msg:"Ce nom est déjà utilisé." };
+    const p = findPlayer(state, playerId);
+    const oldName = p.name;
+    p.name = newName;
+    addTx(state, { from: oldName, to: newName, amount: 0, status: "Nom modifié", actor: "player" });
+    return { ok:true, msg:"Nom mis à jour." };
+  });
+
+  msg.innerHTML = result.ok ? `<span class="ok">${result.msg}</span>` : `<span class="err">${result.msg}</span>`;
+});
+
+document.getElementById("playerPinBtn").addEventListener("click", async () => {
+  const playerId = session.lastPlayer;
+  const msg = document.getElementById("playerPinMsg");
+  const newPin = document.getElementById("playerPinInput").value.trim();
+
+  if(!playerId){
+    msg.innerHTML = `<span class="err">Tu n'es pas connecté.</span>`;
+    return;
+  }
+  if(!/^\d{4,8}$/.test(newPin)){
+    msg.innerHTML = `<span class="err">Le code PIN doit contenir entre 4 et 8 chiffres.</span>`;
+    return;
+  }
+
+  const result = await commitState((state) => {
+    const p = findPlayer(state, playerId);
+    p.pin = newPin;
+    addTx(state, { from: p.name, to: p.name, amount: 0, status: "PIN modifié", actor: "player" });
+    return { ok:true, msg:"Code PIN mis à jour." };
+  });
+
+  if(result.ok) document.getElementById("playerPinInput").value = "";
+  msg.innerHTML = result.ok ? `<span class="ok">${result.msg}</span>` : `<span class="err">${result.msg}</span>`;
+});
+
+document.getElementById("adminLoginBtn").addEventListener("click", () => {
+  const state = currentState();
+  const code = document.getElementById("adminCode").value.trim();
+  if(code !== state.adminCode){
+    alert("Code admin incorrect.");
+    return;
+  }
+  adminUnlocked = true;
+  document.getElementById("adminLoginCard").classList.add("hidden");
+  document.getElementById("adminPanel").classList.remove("hidden");
+  refreshPlayerSelects();
+  renderAdmin();
+  showAdminDashboard();
+});
+
+document.getElementById("adminLogoutBtn").addEventListener("click", () => {
+  adminUnlocked = false;
+  document.getElementById("adminCode").value = "";
+  showAdmin();
+});
+
+document.getElementById("createGameBtn").addEventListener("click", async () => {
+  const names = document.getElementById("playerNames").value.split("\n").map(s => s.trim()).filter(Boolean);
+  const initialBalance = Number(document.getElementById("initialBalance").value);
+  const bankStart = Number(document.getElementById("bankStart").value);
+  const newAdminCode = document.getElementById("newAdminCode").value.trim();
+  const msg = document.getElementById("setupMsg");
+
+  if(names.length === 0){
+    msg.innerHTML = `<span class="err">Ajoute au moins un joueur.</span>`;
+    return;
+  }
+  if(!Number.isFinite(initialBalance) || initialBalance < 0 || !Number.isFinite(bankStart) || bankStart < 0){
+    msg.innerHTML = `<span class="err">Montants invalides.</span>`;
+    return;
+  }
+
+  const result = await commitState((state) => {
+    state.players = names.map((name, idx) => ({
+      id: "p" + (idx + 1),
+      name,
+      balance: initialBalance,
+      pin: "0000",
+      history: [{
+        date: nowStr(),
+        type: "Initialisation",
+        detail: "Solde de départ",
+        delta: initialBalance
+      }]
+    }));
+    state.bank = { name: "Banque", balance: bankStart };
+    state.baseQuickAmounts = [10,20,30,50];
+    state.priceMultiplier = 1;
+    state.bankRequests = [];
+    state.transactions = [{
+      date: nowStr(),
+      from: "Système",
+      to: "Tous les joueurs",
+      amount: initialBalance,
+      status: "Partie créée",
+      actor: "admin"
+    }];
+    state.lastBankRequestAmount = "";
+    if(newAdminCode) state.adminCode = newAdminCode;
+    return { ok:true, msg:"Partie créée. Les comptes joueurs ont été réinitialisés. PIN par défaut : 0000." };
+  });
+
+  session.lastPlayer = null;
+  saveSession();
+  msg.innerHTML = result.ok ? `<span class="ok">${result.msg}</span>` : `<span class="err">${result.msg}</span>`;
+});
+
+document.getElementById("adminRenamePlayerBtn").addEventListener("click", async () => {
+  const playerId = document.getElementById("adminRenamePlayerSelect").value;
+  const newName = document.getElementById("adminRenamePlayerInput").value.trim();
+  const msg = document.getElementById("adminRenameMsg");
+
+  if(!playerId){
+    msg.innerHTML = `<span class="err">Sélectionne un joueur.</span>`;
+    return;
+  }
+  if(!newName){
+    msg.innerHTML = `<span class="err">Le nom ne peut pas être vide.</span>`;
+    return;
+  }
+
+  const result = await commitState((state) => {
+    const duplicate = state.players.find(p => p.name.toLowerCase() === newName.toLowerCase() && p.id !== playerId);
+    if(duplicate) return { abort:true, ok:false, msg:"Ce nom est déjà utilisé." };
+    const p = findPlayer(state, playerId);
+    const oldName = p.name;
+    p.name = newName;
+    addTx(state, { from: oldName, to: newName, amount: 0, status: "Nom modifié par admin", actor: "admin" });
+    return { ok:true, msg:"Nom mis à jour." };
+  });
+
+  if(result.ok) document.getElementById("adminRenamePlayerInput").value = "";
+  msg.innerHTML = result.ok ? `<span class="ok">${result.msg}</span>` : `<span class="err">${result.msg}</span>`;
+});
+
+document.getElementById("bankGiveBtn").addEventListener("click", async () => {
+  const id = document.getElementById("bankGiveTarget").value;
+  const amount = document.getElementById("bankGiveAmount").value;
+  const res = await commitState((state) => transfer(state, "bank", id, amount, "admin"));
+  document.getElementById("bankGiveMsg").innerHTML = res.ok ? `<span class="ok">${res.msg}</span>` : `<span class="err">${res.msg}</span>`;
+});
+
+document.getElementById("selectAllPlayersBtn").addEventListener("click", () => {
+  document.querySelectorAll(".bankTakeCheckbox").forEach(cb => cb.checked = true);
+});
+document.getElementById("clearPlayerSelectionBtn").addEventListener("click", () => {
+  document.querySelectorAll(".bankTakeCheckbox").forEach(cb => cb.checked = false);
+});
+
+document.getElementById("bankTakeBtn").addEventListener("click", async () => {
+  const amount = Number(document.getElementById("bankTakeAmount").value);
+  const selected = [...document.querySelectorAll(".bankTakeCheckbox:checked")].map(cb => cb.value);
+  const msg = document.getElementById("bankTakeMsg");
+
+  if(selected.length === 0){
+    msg.innerHTML = `<span class="err">Sélectionne au moins un joueur.</span>`;
+    return;
+  }
+  if(!Number.isFinite(amount) || amount <= 0){
+    msg.innerHTML = `<span class="err">Montant invalide.</span>`;
+    return;
+  }
+
+  const res = await commitState((state) => {
+    let okCount = 0;
+    let failCount = 0;
+    const failures = [];
+    selected.forEach(id => {
+      const one = transfer(state, id, "bank", amount, "admin");
+      if(one.ok) okCount += 1;
+      else {
+        failCount += 1;
+        const p = findPlayer(state, id);
+        failures.push(p ? p.name : id);
+      }
+    });
+    let text = `${okCount} prélèvement(s) effectué(s)`;
+    if(failCount > 0) text += `, ${failCount} refusé(s)` + (failures.length ? ` : ${failures.join(", ")}` : "");
+    return { ok: failCount === 0, msg: text + "." };
+  });
+
+  msg.innerHTML = res.ok ? `<span class="ok">${res.msg}</span>` : `<span class="err">${res.msg}</span>`;
+});
+
+document.getElementById("doublePricesBtn").addEventListener("click", async () => {
+  const res = await commitState((state) => {
+    state.priceMultiplier *= 2;
+    return { ok:true, msg:`Prix doublés. Multiplicateur actuel : x${state.priceMultiplier}.` };
+  });
+  document.getElementById("priceAdminMsg").innerHTML = res.ok ? `<span class="ok">${res.msg}</span>` : `<span class="err">${res.msg}</span>`;
+});
+document.getElementById("halvePricesBtn").addEventListener("click", async () => {
+  const res = await commitState((state) => {
+    state.priceMultiplier = Math.max(1, state.priceMultiplier / 2);
+    return { ok:true, msg:`Prix divisés. Multiplicateur actuel : x${state.priceMultiplier}.` };
+  });
+  document.getElementById("priceAdminMsg").innerHTML = res.ok ? `<span class="ok">${res.msg}</span>` : `<span class="err">${res.msg}</span>`;
+});
+document.getElementById("resetPricesBtn").addEventListener("click", async () => {
+  const res = await commitState((state) => {
+    state.priceMultiplier = 1;
+    return { ok:true, msg:`Prix réinitialisés sur la base x1.` };
+  });
+  document.getElementById("priceAdminMsg").innerHTML = res.ok ? `<span class="ok">${res.msg}</span>` : `<span class="err">${res.msg}</span>`;
+});
+
+document.getElementById("bankReloadBtn").addEventListener("click", async () => {
+  const amount = Number(document.getElementById("bankReloadAmount").value);
+  const msg = document.getElementById("bankReloadMsg");
+  if(!Number.isFinite(amount) || amount <= 0){
+    msg.innerHTML = `<span class="err">Montant invalide.</span>`;
+    return;
+  }
+  const res = await commitState((state) => {
+    state.bank.balance += amount;
+    addTx(state, { from: "Système", to: "Banque", amount, status: "Banque rechargée", actor: "admin" });
+    return { ok:true, msg:`Banque rechargée de ${fmt(amount)}.` };
+  });
+  if(res.ok) document.getElementById("bankReloadAmount").value = "";
+  msg.innerHTML = res.ok ? `<span class="ok">${res.msg}</span>` : `<span class="err">${res.msg}</span>`;
+});
+
+document.getElementById("wipeBtn").addEventListener("click", async () => {
+  const yes = confirm("Tout effacer ? Cette action supprime la partie et l'historique.");
+  if(!yes) return;
+  await set(gameRef, defaultState());
+  adminUnlocked = false;
+  session.lastPlayer = null;
+  saveSession();
+  document.getElementById("setupMsg").innerHTML = `<span class="ok">Données effacées.</span>`;
+  showAdmin();
+});
+
+refreshPlayerSelects();
+renderPlayer();
+showPlayerOverview();
+showHome();
+initializeFirebase();
+</script>
+
+</body>
+</html>
