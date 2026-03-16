@@ -490,9 +490,7 @@ th,td{
       </div>
     </section>
 
-    <div class="footer">
-      Une fois validé, on pourra retravailler le visuel sans toucher à cette structure.
-    </div>
+
   </div>
 
 
@@ -1072,7 +1070,7 @@ async function initializeFirebase(){
       showFirebaseBannerError(`Erreur Firebase : ${error.message}`);
     });
 
-    showFirebaseBannerError(`Connecté à la partie partagée <strong>${GAME_ID}</strong>. Héberge ce fichier sur Vercel et ouvre la même URL sur chaque téléphone.`);
+
   } catch (error) {
     connectionError = error;
     showFirebaseBannerError(`Configuration Firebase invalide : ${error.message}`);
