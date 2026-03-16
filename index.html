@@ -434,13 +434,13 @@ th,td{
               </div>
               <div>
                 <label for="initialBalance">Solde initial par joueur</label>
-                <input id="initialBalance" type="number" min="0" step="1" value="1000" />
+                <input id="initialBalance" type="number" inputmode="numeric" pattern="[0-9]*" />
                 <div style="height:12px"></div>
                 <label for="bankStart">Solde de la banque</label>
                 <input id="bankStart" type="number" inputmode="numeric" pattern="[0-9]*"  />
                 <div style="height:12px"></div>
                 <label for="newAdminCode">Nouveau code admin</label>
-                <input id="newAdminCode" type="number" inputmode="numeric" pattern="[0-9]*" placeholder="Laisser vide pour garder l'actuel" />
+                <input id="newAdminCode" type="number" inputmode="numeric" pattern="[0-9]*"  />
               </div>
             </div>
             <div class="row" style="margin-top:12px">
@@ -473,7 +473,7 @@ th,td{
             <div class="grid g2">
               <div>
                 <label for="bankReloadAmount">Montant</label>
-                <input id="bankReloadAmount" type="number" min="1" step="1" placeholder="Ex. 10000" />
+                <input id="bankReloadAmount" type="number" inputmode="numeric" pattern="[0-9]*" />
               </div>
               <div style="align-self:end">
                 <button id="bankReloadBtn">Recharger la banque</button>
